@@ -1,0 +1,33 @@
+name: Bash validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/scripts/**'
+      - '.github/workflows/shellcheck.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'tests/scripts/**'
+      - '.github/workflows/shellcheck.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: |
+          command -v shellcheck || (sudo apt-get update && sudo apt-get install -y shellcheck)
+          bash -n scripts/lib/common.bash
+          bash -n tests/scripts/smoke.sh
+          bash tests/scripts/smoke.sh
+      - run: shellcheck -x scripts/*.sh scripts/lib/common.bash tests/scripts/*.sh

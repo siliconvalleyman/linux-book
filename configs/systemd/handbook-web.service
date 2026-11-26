@@ -1,0 +1,20 @@
+[Unit]
+Description=Handbook local web service
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=4
+
+[Service]
+Type=exec
+DynamicUser=yes
+WorkingDirectory=/srv/handbook/www
+ExecStart=/usr/bin/python3 -m http.server 18085 --bind 127.0.0.1
+Restart=on-failure
+RestartSec=3s
+MemoryMax=128M
+TasksMax=32
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_INET AF_UNIX

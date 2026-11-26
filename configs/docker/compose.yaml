@@ -1,0 +1,46 @@
+services:
+  node:
+    build: ./node
+    networks: [app]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+  python:
+    build: ./python
+    networks: [app]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "127.0.0.1:18086:8080"
+    volumes:
+      - ./proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [app]
+    depends_on: [node, python]
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [data]
+  redis:
+    image: redis:7-alpine
+    command: [redis-server, "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks: [data]
+
+networks:
+  app:
+  data:
+    internal: true
+
+secrets:
+  postgres_password:
+    file: ${POSTGRES_PASSWORD_FILE_HOST:?Set the path to the local PostgreSQL secret file}
+
+volumes:
+  postgres_data:
+  redis_data:
