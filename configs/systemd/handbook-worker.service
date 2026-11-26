@@ -1,0 +1,14 @@
+[Unit]
+Description=Handbook HTTP readiness check
+Requires=handbook-web.service
+After=handbook-web.service
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+ExecStart=/usr/bin/curl --fail --silent --show-error --retry 2 --retry-connrefused --max-time 3 --output /dev/null http://127.0.0.1:18085/
+TimeoutStartSec=20s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
