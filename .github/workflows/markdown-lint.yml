@@ -1,0 +1,28 @@
+name: Markdown lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - '.markdownlint.json'
+      - '.github/workflows/markdown-lint.yml'
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '.markdownlint.json'
+      - '.github/workflows/markdown-lint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: npx --yes markdownlint-cli2@0.18.1 '**/*.md' '.github/**/*.md'
